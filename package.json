@@ -1,0 +1,26 @@
+{
+  "name": "hrmon-svc",
+  "version": "1.0.0",
+  "main": "server.js",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^2.17.0",
+    "async-mqtt": "^2.3.0",
+    "bottleneck": "^2.19.2",
+    "dayjs": "^1.8.15",
+    "fastify": "^2.6.0",
+    "geolib": "^3.0.4",
+    "graphql": "^14.4.2",
+    "lodash-id": "^0.14.0",
+    "lowdb": "^1.0.0",
+    "mqtt": "^3.0.0",
+    "node-rsa": "^1.0.5",
+    "rxjs": "^6.5.2",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "sqlite3": "^4.0.9",
+    "squel": "^5.13.0",
+    "timeago.js": "^4.0.0-beta.2",
+    "xlsx": "^0.15.5"
+  }
+}
