@@ -1145,6 +1145,8 @@ onGPS.subscribe((gpsData) => {
         isOnline: true,
         isWeared: true,
         isGpsReady: true,
+        lastlat: gps.latitude,
+        lastlon: gps.longitude,
         distance: getDistance(testParticipantId),
         WAKTOS: ongoingTimer,
       })),
