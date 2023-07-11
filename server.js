@@ -1612,19 +1612,16 @@ function getOngoingTimer() {
   };
 }
 
-async function addTest(
-  _,
-  {
-    eventName,
-    timeScheduled,
-    mode,
-    coach,
-    committee,
-    location,
-    participants,
-    category,
-  }
-) {
+async function addTest(_, {
+  eventName,
+  timeScheduled,
+  mode,
+  coach,
+  committee,
+  location,
+  participants,
+  category,
+}) {
   const testId = await new Promise((resolve, reject) => {
     DB.run(
       "INSERT INTO tests (eventName, mode, timeScheduled, status, coach, committee, location, category) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
@@ -1640,20 +1637,63 @@ async function addTest(
       ],
       function (err) {
         if (err) reject(err);
-
-        resolve(this.lastID);
+        else resolve(this.lastID);
       }
     );
   });
 
-  DB.parallelize(function () {
-    participants.forEach((p) => {
+  const participantPromises = participants.map(p => {
+    return new Promise((resolve, reject) => {
       DB.run(
         "INSERT INTO test_participants(test_id, participant_id, participant_number, device_id, chip_id) VALUES(?, ?, ?, ?, ?)",
-        [testId, p.participantId, p.number, p.deviceId, p.deviceChipId]
+        [testId, p.participantId, p.number, p.deviceId, p.deviceChipId],
+        function (err) {
+          if (err) reject(err);
+          else resolve();
+        }
       );
     });
   });
+
+  await Promise.all(participantPromises);
+
+  for (const p of participants) {
+    try {
+      const row = await new Promise((resolve, reject) => {
+        DB.get(
+          "SELECT id FROM test_participants WHERE test_id = ? AND participant_id = ?",
+          [testId, p.participantId],
+          function (err, row) {
+            if (err) reject(err);
+            else resolve(row);
+          }
+        );
+      });
+
+      if (row) {
+        const testParticipantID = row.id;
+        const chipdeviceId = await new Promise((resolve, reject) => {
+          DB.get(
+            "SELECT id, chipId FROM chips WHERE id = ?",
+            [Number(p.deviceChipId)],
+            function (err, row) {
+              if (err) reject(err);
+              else resolve(row.chipId);
+            }
+          );
+        });
+
+        //console.log(`${testParticipantID} ${chipdeviceId} ${p.deviceChipId}`);
+        client.publish(`chipready/${testParticipantID}/${chipdeviceId}/${p.deviceChipId}`, '', function (err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return testId;
 }
