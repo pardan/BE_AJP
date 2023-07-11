@@ -1140,12 +1140,14 @@ onGPS.subscribe((gpsData) => {
   // TODO: Handler If Finished
   try {
     PUBSUB.publish(DISTANCE, {
-      [DISTANCE]: gpsData.map(async ({ devId, gps }) => ({
+      [DISTANCE]: gpsData.map(async ({ devId, testParticipantId, gps }) => ({
         id: await getDeviceId(devId),
         isOnline: true,
         isWeared: true,
         isGpsReady: true,
-        distance: gps.distance,
+        lastlat: gps.latitude,
+        lastlon: gps.longitude,
+        distance: getDistance(testParticipantId),
         WAKTOS: ongoingTimer,
       })),
     });
@@ -2388,6 +2390,24 @@ function getDeviceId(devId) {
     }
   });
 }
+
+function getDistance(testParticipantId) {
+  return new Promise((resolve, reject) => {
+    DB.get(
+        "SELECT * FROM test_participants WHERE id = ?",
+        [testParticipantId],
+        function (err, row) {
+          if (err) reject(err);
+
+          if (row) {
+            resolve(row.distance);
+          } else {
+            resolve(null);
+          }
+        }
+      );
+  });
+};
 
 function deleteTest(_, { id = null }) {
   return new Promise((resolve, reject) => {
