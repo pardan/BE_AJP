@@ -36,7 +36,7 @@ const DB_SCHEMA = [
   `PRAGMA foreign_keys = ON`,
   `CREATE TABLE IF NOT EXISTS devices (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        devId STRING UNIQUE,
+        devId TEXT UNIQUE,
         code TEXT UNIQUE
     )`,
   `CREATE TABLE IF NOT EXISTS chips (
@@ -1663,7 +1663,7 @@ async function addTest(_, {
     try {
       const row = await new Promise((resolve, reject) => {
         DB.get(
-          "SELECT id FROM test_participants WHERE test_id = ? AND participant_id = ?",
+          "SELECT id FROM test_participants WHERE test_id = ? AND participant_id = ? AND finished IS NULL",
           [testId, p.participantId],
           function (err, row) {
             if (err) reject(err);

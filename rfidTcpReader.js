@@ -8,7 +8,7 @@ const { bufferTime, filter, map, take, tap } = require("rxjs/operators");
 
 //CONFIG
 // The port number and hostname of the server.
-const host = ["192.168.0.178","127.0.0.1","127.0.0.1","127.0.0.1"]
+const host = ["192.168.1.200","127.0.0.1","127.0.0.1","127.0.0.1"]
 const port = [4001,4002,4003,4004]
 const MQTT_HOST = "tcp://localhost:1883";
 
@@ -237,7 +237,7 @@ function sendMQTT(i,j)
 	//console.log('From Reader :', reader )
 	//console.log('EPCID :', epcId )
 	//console.log('Count Pass :', countPass )
-	console.log('Print Result Check EPC :', result);
+	//console.log('Print Result Check EPC :', result);
 	if (result) {
 		const participantId = findParticipantId(dobArraySearchStrings, epcId);
 		const chipId = findChipId(dobArraySearchStrings, epcId);
@@ -251,7 +251,7 @@ function sendMQTT(i,j)
 			}
 		  });
 	  } else {
-		console.log("Print false or no data match ");
+		//console.log("Print false or no data match ");
 	  }
 }
 for (let i=0;i<countReader;i++)
