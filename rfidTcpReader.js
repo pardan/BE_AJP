@@ -61,21 +61,25 @@ const onChipReady = onMessage.pipe(
   
   // Subscribe to the chipStatusReady observable
   onChipReady.subscribe((chipStatusReady) => {
+	searchStrings.splice(0, searchStrings.length); // Clear the searchStrings array
 	chipStatusReady
 	  .filter(({ testParticipantId }) => testParticipantId !== null)
 	  .forEach(({ testParticipantId, chipId, idchip }) => {
 		// Create the search string array
-		const searchString = [testParticipantId, chipId, idchip];
+		let searchString = [testParticipantId, chipId, idchip];
   
 		// Add the search string array to the searchStrings array
+
 		searchStrings.push(searchString);
 	  });
   
 	// Log the updated searchStrings array
 	//console.log("Print Value Array MQTT:", searchStrings);
+
+	dobArraySearchStrings.splice(0, dobArraySearchStrings.length); // Clear the dobArraySearchStrings array
 	dobArraySearchStrings = searchStrings;
   
-	//console.log("Updated dobArraySearchStrings array:", dobArraySearchStrings);
+	console.log("Updated dobArraySearchStrings array:", dobArraySearchStrings);
   });
 
 
@@ -245,11 +249,13 @@ function sendMQTT(i,j)
 		console.log("Print Participant Id: ", participantId);
 		console.log("Print Chip Id: ", chipId);
 		console.log("Print Idchip:", Idchip);
+		console.log("Print Reader:", reader);
 		clientmqtt.publish(`chip/${Idchip}/${participantId}`, reader.toString(), function (err) {
 			if (err) {
-			  console.log(err);
+				console.log(err);
 			}
-		  });
+		});
+		
 	  } else {
 		//console.log("Print false or no data match ");
 	  }
