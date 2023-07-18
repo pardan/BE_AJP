@@ -15,6 +15,7 @@ var countReader = 1;
 const activeTimeout = 2000;
 var client = [];
 var searchStrings = [];
+var isTrue = false;
 
 //const client = mqtt.connect(MQTT_HOST);
 const clientmqtt = mqtt.connect(MQTT_HOST);
@@ -226,21 +227,24 @@ function sendMQTT(i, j) {
     console.log("Print Chip Id: ", chipId);
     console.log("Print Idchip:", Idchip);
     console.log("Print Reader:", reader);
-    clientmqtt.publish(
-      `chip/${Idchip}/${participantId}`,
-      reader.toString(),
-      function (err) {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
+	console.log(typeof reader);
+	console.log(isTrue);
+	if ((reader == 2) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
+		isTrue = true;
+		clientmqtt.publish(`chip/${Idchip}/${participantId}`, reader.toString(), function (err) {
+			if (err) {
+				console.log(err);
+			}
+		});
+	} else {
+		console.log('Belum Melewati Reader 2');
+	}
   } else {
     //console.log("Print false or no data match ");
   }
 }
 
-/*
+
 for (let i = 0; i < countReader; i++) {
   client[i].connect({ port: port[i], host: host[i] }, () => {
     client[i].on("data", (chunk) => {
@@ -253,7 +257,7 @@ setInterval(() => {
   cmd_fast_switch_ant_inventory();
   //cmd_real_time_inventory();
 }, 1000);
-*/
+
 
 setInterval(() => {
   var now = Date.now();
