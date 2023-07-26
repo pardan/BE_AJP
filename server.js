@@ -224,8 +224,10 @@ const typeDefs = gql`
     id: ID
     participantId: ID
     deviceId: ID
+    deviceChipId: ID
     fullname: String
     code: String
+    codeChip: String
     number: String
   }
 
@@ -1569,18 +1571,25 @@ async function getTest(_, { id }) {
     const testParticipants = await new Promise((resolve, reject) => {
       DB.all(
         `            
-                SELECT 
-                    tp.id,
-                    tp.participant_number,
-                    tp.participant_id,
-                    p.fullname,
-                    d.code,
-                    d.id as deviceId
-                FROM test_participants tp 
-                LEFT JOIN participants p ON tp.participant_id = p.id
-                LEFT JOIN devices d ON tp.device_id = d.id
-                WHERE test_id = ?
-                GROUP BY tp.id`,
+        SELECT 
+          tp.id,
+          tp.participant_number,
+          tp.participant_id,
+          p.fullname,
+          d.code,
+          d.id as deviceId,
+          c.codeChip,
+          c.id as chipId
+        FROM
+          test_participants tp 
+        LEFT JOIN
+          participants p ON tp.participant_id = p.id
+        LEFT JOIN
+          devices d ON tp.device_id = d.id
+        LEFT JOIN
+          chips c ON tp.chip_id = c.id
+        WHERE test_id = ?
+        GROUP BY tp.id`,
         [test.id],
         (err, rows) => {
           if (err) reject(err);
@@ -1590,8 +1599,10 @@ async function getTest(_, { id }) {
               id: row.id,
               number: row.participant_number,
               code: row.code,
+              codeChip: row.codeChip,
               fullname: row.fullname,
               deviceId: row.deviceId,
+              deviceChipId: row.chipId,
               participantId: row.participant_id,
             }))
           );
@@ -1738,8 +1749,8 @@ async function updateTest(_, { test }) {
     DB.parallelize(function () {
       test.participants.forEach((p) => {
         DB.run(
-          "INSERT INTO test_participants(test_id, participant_id, participant_number, device_id) VALUES(?, ?, ?, ?)",
-          [test.id, p.participantId, p.number, p.deviceId]
+          "INSERT INTO test_participants(test_id, participant_id, participant_number, device_id, chip_id) VALUES(?, ?, ?, ?, ?)",
+          [test.id, p.participantId, p.number, p.deviceId, p.deviceChipId]
         );
       });
     });
