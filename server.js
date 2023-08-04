@@ -477,7 +477,7 @@ const typeDefs = gql`
     editChip(id: ID, chip: ChipInput): Boolean
     beginTest(testId: ID): Boolean
     deleteTest(id: ID): Boolean
-    addParticipant(participant: ParticipantInput): ID
+    addParticipant(participants: [ParticipantInput]): ID
     deleteParticipant(id: ID): Boolean
     updateParticipant(id: ID, participant: ParticipantInput): Boolean
     updateTest(test: TestEdit): Boolean
@@ -1394,28 +1394,40 @@ function getParticipants(
   });
 }
 
-function addParticipant(_, { participant }) {
-  return new Promise((resolve, reject) => {
-    DB.run(
-      `INSERT INTO participants(fullname, gender, weight, height, birthDate, id_pangkat, NRP, jabatan, kesatuan) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        participant.fullname,
-        participant.gender,
-        participant.weight,
-        participant.height,
-        participant.birthDate,
-        participant.idPangkat,
-        participant.NRP,
-        participant.jabatan,
-        participant.kesatuan,
-      ],
-      function (err) {
-        if (err) reject(err);
+async function addParticipant(_, { participants }) {
+  //console.log("test")
+  try {
 
-        resolve(this.lastID);
-      }
-    );
-  });
+    const insertQueries = participants.map(participant => {
+      return new Promise((resolve, reject) => {
+
+        DB.run(
+          `INSERT INTO participants(fullname, gender, weight, height, birthDate, id_pangkat, NRP, jabatan, kesatuan) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            participant.fullname,
+            participant.gender,
+            participant.weight,
+            participant.height,
+            participant.birthDate,
+            participant.idPangkat,
+            participant.NRP,
+            participant.jabatan,
+            participant.kesatuan,
+          ],
+          function (err) {
+            if (err) reject(err);
+            resolve(this.lastID);
+          }
+        );
+      });
+    });
+
+    // Execute all the insert queries using Promise.all
+    const ids = await Promise.all(insertQueries);
+    return ids;
+  } catch (err) {
+    throw err;
+  }
 }
 
 function deleteParticipant(_, { id }) {
