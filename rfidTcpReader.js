@@ -7,11 +7,11 @@ const { bufferTime, filter, map, take, tap } = require("rxjs/operators");
 
 //CONFIG
 // The port number and hostname of the server.
-const host = ["192.168.1.200", "127.0.0.1", "127.0.0.1", "127.0.0.1"];
-const port = [4001, 4002, 4003, 4004];
+const host = ["192.168.1.21", "192.168.1.22", "192.168.1.23", "192.168.1.24"];
+const port = [4001, 4001, 4001, 4001];
 const MQTT_HOST = "tcp://localhost:1883";
 
-var countReader = 1;
+var countReader = 4;
 const activeTimeout = 2000;
 var client = [];
 var searchStrings = [];
@@ -55,6 +55,7 @@ const onChipReady = onMessage.pipe(
 
 // Subscribe to the chipStatusReady observable
 onChipReady.subscribe((chipStatusReady) => {
+  isTrue = false;
   searchStrings.splice(0, searchStrings.length); // Clear the searchStrings array
   chipStatusReady
     .filter(({ testParticipantId }) => testParticipantId !== null)
@@ -203,7 +204,7 @@ function findIdchip(array, epcId) {
 
 function sendMQTT(i, j) {
   console.log(
-    "MQTT " +
+    "READER " +
       (j + 1) +
       " " +
       packetUtils.dumpData(List[i].epc) +
