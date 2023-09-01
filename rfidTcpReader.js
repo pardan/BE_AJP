@@ -289,4 +289,4 @@ setInterval(() => {
     }
     //console.log(packetUtils.dumpData(List[i].epc)+data)
   }
-}, 500);
+}, 1000);
