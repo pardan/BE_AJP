@@ -12,7 +12,7 @@ const port = [4001, 4001, 4001, 4001];
 const MQTT_HOST = "tcp://localhost:1883";
 
 var countReader = 4;
-const activeTimeout = 2000;
+const activeTimeout = 10000;
 var client = [];
 var searchStrings = [];
 var isTrue = false;
@@ -206,10 +206,10 @@ function sendMQTT(i, j) {
   console.log(
     "READER " +
       (j + 1) +
-      " CONNECTED"
-      //packetUtils.dumpData(List[i].epc) +
-      //" " +
-      //List[i].cntPass[j]
+      " CONNECTED " +
+      packetUtils.dumpData(List[i].epc) +
+      " " +
+      List[i].cntPass[j]
   );
   var epcId = packetUtils.dumpData(List[i].epc);
   var countPass = List[i].cntPass[j];
@@ -289,4 +289,4 @@ setInterval(() => {
     }
     //console.log(packetUtils.dumpData(List[i].epc)+data)
   }
-}, 1000);
+}, 500);
