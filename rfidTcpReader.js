@@ -228,8 +228,8 @@ function sendMQTT(i, j) {
     console.log("Print Chip Id: ", chipId);
     console.log("Print Idchip:", Idchip);
     console.log("Print Reader:", reader);
-	console.log(typeof reader);
-	console.log(isTrue);
+	//console.log(typeof reader);
+	//console.log(isTrue);
 	if ((reader == 2) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
 		isTrue = true;
 		clientmqtt.publish(`chip/${Idchip}/${participantId}`, reader.toString(), function (err) {
