@@ -104,6 +104,7 @@ const DB_SCHEMA = [
         lastlat REAL,
         lastlon REAL,
         lastreader INTEGER,
+        temp_distance REAL DEFAULT 0,
         FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
         FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
         FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE,
@@ -325,6 +326,7 @@ const typeDefs = gql`
     WAKTOS: Int
     lastlat: Float
     lastlon: Float
+    temp_distance: Float
   }
 
   type TestParticipantResult {
@@ -845,7 +847,7 @@ const onGPS = onMessage.pipe(
         current.get("data").push(point).write();
       }
 
-      //const distance = getPathLength(current.get("data").value());
+      const temp_distance = getPathLength(current.get("data").value());
 
       return {
         devId: String(deviceId),
@@ -855,6 +857,7 @@ const onGPS = onMessage.pipe(
           accuracy: parseFloat(accuracy),
           distance: '',
           lastDistance: '',
+          temp_distance,
         },
         timestamp: data[3],
       };
@@ -896,8 +899,8 @@ onGPS.subscribe((gpsData) => {
         );
 
         DB.run(
-          "UPDATE test_participants SET lastlat = ?, lastlon = ? WHERE id = ?",
-          [gps.latitude, gps.longitude, testParticipantId],
+          "UPDATE test_participants SET lastlat = ?, lastlon = ?, temp_distance = ? WHERE id = ?",
+          [gps.latitude, gps.longitude, gps.temp_distance, testParticipantId],
           function (err) {
             if (err) {
               console.log(err);
@@ -1150,6 +1153,7 @@ onGPS.subscribe((gpsData) => {
         lastlat: gps.latitude,
         lastlon: gps.longitude,
         distance: getDistance(testParticipantId),
+        temp_distance: getTempDistance(testParticipantId),
         WAKTOS: ongoingTimer,
       })),
     });
@@ -1225,7 +1229,7 @@ const onHeartRate = onMessage.pipe(
   map((all) =>
     all.map((data) => {
       const [, deviceId, testParticipantId] = data[0].split("/");
-
+      
       return {
         devId: String(deviceId),
         testParticipantId: testParticipantId ? Number(testParticipantId) : null,
@@ -2420,6 +2424,24 @@ function getDistance(testParticipantId) {
   });
 };
 
+function getTempDistance(testParticipantId) {
+  return new Promise((resolve, reject) => {
+    DB.get(
+        "SELECT * FROM test_participants WHERE id = ?",
+        [testParticipantId],
+        function (err, row) {
+          if (err) reject(err);
+
+          if (row) {
+            resolve(row.temp_distance);
+          } else {
+            resolve(null);
+          }
+        }
+      );
+  });
+};
+
 function deleteTest(_, { id = null }) {
   return new Promise((resolve, reject) => {
     if (id !== null) {
@@ -2488,7 +2510,8 @@ async function getOngoingTestParticipants() {
             heartRateThreshold: getHeartRateThreshold(x.birthDate),
             WAKTOS: x.time,
             lastlat: x.lastlat,
-            lastlon: x.lastlon
+            lastlon: x.lastlon,
+            temp_distance: x.temp_distance
           }))
         );
       }
