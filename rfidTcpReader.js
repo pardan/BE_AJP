@@ -65,7 +65,7 @@ onChipReady.subscribe((chipStatusReady) => {
       searchStrings.push(searchString);
       //console.log("Didalam forEach", searchStrings);
     });
-  console.log("Diluar forEach", searchStrings);
+  //console.log("Diluar forEach", searchStrings);
 });
 
 // Creating a client socket
@@ -206,10 +206,10 @@ function sendMQTT(i, j) {
   console.log(
     "READER " +
       (j + 1) +
-      " " +
-      packetUtils.dumpData(List[i].epc) +
-      " " +
-      List[i].cntPass[j]
+      " CONNECTED"
+      //packetUtils.dumpData(List[i].epc) +
+      //" " +
+      //List[i].cntPass[j]
   );
   var epcId = packetUtils.dumpData(List[i].epc);
   var countPass = List[i].cntPass[j];
