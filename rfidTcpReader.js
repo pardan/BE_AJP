@@ -68,11 +68,6 @@ onChipReady.subscribe((chipStatusReady) => {
   //console.log("Diluar forEach", searchStrings);
 });
 
-// Creating a client socket
-for (let i = 0; i < countReader; i++) {
-  client[i] = new Net.Socket();
-}
-
 function sendData(packet, len) {
   for (let i = 0; i < countReader; i++)
     client[i].write(packet.subarray(0, len));
@@ -206,7 +201,7 @@ function sendMQTT(i, j) {
   console.log(
     "READER " +
       (j + 1) +
-      " CONNECTED " +
+      " " +
       packetUtils.dumpData(List[i].epc) +
       " " +
       List[i].cntPass[j]
@@ -245,20 +240,42 @@ function sendMQTT(i, j) {
   }
 }
 
+// Function to establish a client connection and handle reconnection
+function connectClient(i) {
+  // Create a new client socket
+  client[i] = new Net.Socket();
 
-for (let i = 0; i < countReader; i++) {
+  // Attempt to connect to the specified host and port
   client[i].connect({ port: port[i], host: host[i] }, () => {
-    client[i].on("data", (chunk) => {
-      //		console.log('recv:'+dump(chunk));
-      parse(chunk, i);
-    });
+    // Connection successful
+    console.log(`Reader ${i+1} connected successfully.`);
   });
+
+  // Handle data received from the server
+  client[i].on("data", (chunk) => {
+    // Parse and process the received data
+    parse(chunk, i);
+  });
+
+  // Handle connection errors
+  client[i].on("error", (error) => {
+    if (error) {
+      console.log(`Connection to Reader ${i+1} ${error.code}. Attempting to reconnect...`);
+      setTimeout(() => {
+        connectClient(i);
+      }, 1000);
+    }
+  });
+}
+
+// Loop to create and connect multiple client
+for (let i = 0; i < countReader; i++) {
+  connectClient(i);
 }
 setInterval(() => {
   cmd_fast_switch_ant_inventory();
   //cmd_real_time_inventory();
 }, 1000);
-
 
 setInterval(() => {
   var now = Date.now();
