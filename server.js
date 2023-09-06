@@ -1712,12 +1712,14 @@ async function addTest(_, {
           );
         });
 
-        //console.log(`${testParticipantID} ${chipdeviceId} ${p.deviceChipId}`);
+/*
         client.publish(`chipready/${testParticipantID}/${chipdeviceId}/${p.deviceChipId}`, '', function (err) {
           if (err) {
             console.log(err);
           }
         });
+*/
+
       }
     } catch (err) {
       console.log(err);
@@ -1974,15 +1976,24 @@ function beginTest(_, { testId }) {
 
         DB.all(
           `
-                SELECT d.id, d.devId, d.code, participant_id 
+                SELECT d.id, d.devId, d.code, c.id AS c_id, c.chipId, c.codeChip, participant_id, tp.id AS tp_id
                 FROM test_participants tp
-                JOIN devices d ON tp.device_id = d.id 
+                JOIN devices d ON tp.device_id = d.id
+                JOIN chips c ON tp.chip_id = c.id
                 WHERE test_id = ?`,
           [Number(testId)],
           function (err, rows) {
             if (err) reject(err);
 
             rows.forEach((r) => idMappings.set(r.devId, r.id));
+
+            rows.forEach((toreader) => 
+              client.publish(`chipready/${toreader.tp_id}/${toreader.chipId}/${toreader.c_id}`, '', function (err) {
+                if (err) {
+                  console.log(err);
+                }
+              })
+            );
 
             const assignDevices = Promise.all(
               rows.map((row) =>
