@@ -103,7 +103,7 @@ const DB_SCHEMA = [
         score INTEGER,
         lastlat REAL,
         lastlon REAL,
-        lastreader INTEGER,
+        lastreader INTEGER DEFAULT 0,
         temp_distance REAL DEFAULT 0,
         FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
         FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE,
@@ -933,7 +933,7 @@ const onChip = onMessage.pipe(
           // Use a promise to wrap the database operation
           const updateDistancePromise1 = new Promise((resolve, reject) => {
             DB.all(
-              "SELECT distance FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              "SELECT distance, lastreader FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
               [testParticipantId, chipId],
               (error, rows) => {
                 if (error) {
@@ -941,9 +941,20 @@ const onChip = onMessage.pipe(
                   reject(error);
                 } else {
                   let distances1 = rows.map(row => row.distance);
-                  console.log("dari table", distances1);
-                  ke1 = parseFloat(distances1) + 115.61;
-                  console.log("hasil akhir", ke1);
+                  let lastreader1 = rows.map(row => row.lastreader);
+                  if (lastreader1 == 4) {
+                    ke1 = parseFloat(distances1) + 115.61;
+                    console.log("hasil akhir", ke1);
+                  } else if(lastreader1 == 3) {
+                    ke1 = parseFloat(distances1) + 200;
+                    console.log("hasil akhir", ke1);
+                  } else if(lastreader1 == 2) {
+                    ke1 = parseFloat(distances1) + 315.61;
+                    console.log("hasil akhir", ke1);
+                  } else {
+                    ke1 = parseFloat(distances1) + 400;
+                    console.log("hasil akhir", ke1);
+                  }
 
                   // Resolve the promise with the updated distance value
                   resolve(ke1);
@@ -976,7 +987,7 @@ const onChip = onMessage.pipe(
           // Use a promise to wrap the database operation
           const updateDistancePromise2 = new Promise((resolve, reject) => {
             DB.all(
-              "SELECT distance FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              "SELECT distance, lastreader FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
               [testParticipantId, chipId],
               (error, rows) => {
                 if (error) {
@@ -984,9 +995,24 @@ const onChip = onMessage.pipe(
                   reject(error);
                 } else {
                   let distances2 = rows.map(row => row.distance);
-                  console.log("dari table", distances2);
-                  ke2 = parseFloat(distances2) + 84.39;
-                  console.log("hasil akhir", ke2);
+                  let lastreader2 = rows.map(row => row.lastreader);
+                  console.log("LAST READER: ",lastreader2)
+                  if (lastreader2 == 1) {
+                    ke2 = parseFloat(distances2) + 84.39;
+                    console.log("hasil akhir", ke2);
+                  } else if(lastreader2 == 4) {
+                    ke2 = parseFloat(distances2) + 200;
+                    console.log("hasil akhir", ke2);
+                  } else if(lastreader2 == 3) {
+                    ke2 = parseFloat(distances2) + 284.39;
+                    console.log("hasil akhir", ke2);
+                  } else if(lastreader2 == 0){
+                    ke2 = parseFloat(distances2) + 84.39;
+                    console.log("hasil akhir", ke2);
+                  } else {
+                    ke2 = parseFloat(distances2) + 400;
+                    console.log("hasil akhir", ke2);
+                  }
 
                   // Resolve the promise with the updated distance value
                   resolve(ke2);
@@ -1018,7 +1044,7 @@ const onChip = onMessage.pipe(
           // Use a promise to wrap the database operation
           const updateDistancePromise3 = new Promise((resolve, reject) => {
             DB.all(
-              "SELECT distance FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              "SELECT distance, lastreader FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
               [testParticipantId, chipId],
               (error, rows) => {
                 if (error) {
@@ -1026,9 +1052,24 @@ const onChip = onMessage.pipe(
                   reject(error);
                 } else {
                   let distances3 = rows.map(row => row.distance);
-                  console.log("dari table", distances3);
-                  ke3 = parseFloat(distances3) + 115.61;
-                  console.log("hasil akhir", ke3);
+                  let lastreader3 = rows.map(row => row.lastreader);
+                  console.log("LAST READER: ",lastreader3)
+                  if (lastreader3 == 2) {
+                    ke3 = parseFloat(distances3) + 115.61;
+                    console.log("hasil akhir rumus 1", ke3);
+                  } else if(lastreader3 == 1) {
+                    ke3 = parseFloat(distances3) + 200;
+                    console.log("hasil akhir rumus 2", ke3);
+                  } else if(lastreader3 == 4) {
+                    ke3 = parseFloat(distances3) + 315.61;
+                    console.log("hasil akhir rumus 3", ke3);
+                  } else if(lastreader3 == 0){
+                    ke3 = parseFloat(distances3) + 200;
+                    console.log("hasil akhir rumus 4", ke3);
+                  }  else {
+                    ke3 = parseFloat(distances3) + 400;
+                    console.log("hasil akhir rumus 5", ke3);
+                  }
 
                   // Resolve the promise with the updated distance value
                   resolve(ke3);
@@ -1061,7 +1102,7 @@ const onChip = onMessage.pipe(
           // Use a promise to wrap the database operation
           const updateDistancePromise4 = new Promise((resolve, reject) => {
             DB.all(
-              "SELECT distance FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              "SELECT distance, lastreader FROM test_participants WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
               [testParticipantId, chipId],
               (error, rows) => {
                 if (error) {
@@ -1069,9 +1110,23 @@ const onChip = onMessage.pipe(
                   reject(error);
                 } else {
                   let distances4 = rows.map(row => row.distance);
-                  console.log("dari table", distances4);
-                  ke4 = parseFloat(distances4) + 84.39;
-                  console.log("hasil akhir", ke4);
+                  let lastreader4 = rows.map(row => row.lastreader);
+                  if (lastreader4 == 3) {
+                    ke4 = parseFloat(distances4) + 84.39;
+                    console.log("hasil akhir", ke4);
+                  } else if(lastreader4 == 2) {
+                    ke4 = parseFloat(distances4) + 200;
+                    console.log("hasil akhir", ke4);
+                  } else if(lastreader4 == 1) {
+                    ke4 = parseFloat(distances4) + 284.39;
+                    console.log("hasil akhir", ke4);
+                  } else if(lastreader4 == 0){
+                    ke4 = parseFloat(distances4) + 284.39;
+                    console.log("hasil akhir", ke4);
+                  }  else {
+                    ke4 = parseFloat(distances4) + 400;
+                    console.log("hasil akhir", ke4);
+                  }
 
                   // Resolve the promise with the updated distance value
                   resolve(ke4);
@@ -2215,8 +2270,12 @@ async function finishTest() {
           console.log("lat center", parseFloat(latcen));
           console.log("lon center", parseFloat(loncen));
 
-          if ((lastreader == 2) || (lastreader == 4)) {
-            distance = distance + hasilakhirlengkung(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
+          if (lastreader == 2) {
+            distance = distance + hasilakhirlengkung2(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
+            distance = distance.toFixed(2);
+            console.log("distance + hasil lengkung", distance);
+          } else if (lastreader == 4) {
+            distance = distance + hasilakhirlengkung4(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
             distance = distance.toFixed(2);
             console.log("distance + hasil lengkung", distance);
           } else {
@@ -2289,7 +2348,7 @@ async function finishTest() {
 //lat1 dan long 1 = RFID terkahir
 //lat2 dan long 2 = Posisi Peserta Terakhir
 //lat center long center = center point mengambil dari tabel Reader
-function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
+function hasilakhirlengkung2(lat1, lon1, lat2, lon2, latcenter, loncenter) {
   
   const heading1 = calculateHeading1(latcenter, loncenter, lat1, lon1);
   const heading2 = calculateHeading2(latcenter, loncenter, lat2, lon2);
@@ -2298,6 +2357,20 @@ function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
   const selisih = heading1 - heading2;
   console.log("Selisih", selisih);
   const jarak = (selisih / 360) * (2 * 3.14 * 36.8);
+  console.log("distance lengkung", jarak.toFixed(2));
+
+  return jarak
+}
+
+function hasilakhirlengkung4(lat1, lon1, lat2, lon2, latcenter, loncenter) {
+  
+  const heading1 = calculateHeading1(latcenter, loncenter, lat1, lon1);
+  const heading2 = calculateHeading2(latcenter, loncenter, lat2, lon2);
+  console.log("Heading 1", heading1);
+  console.log("Heading 2", heading2);
+  const selisih = heading1 - heading2;
+  console.log("Selisih", selisih);
+  const jarak = (selisih / 180) * (2 * 3.14 * 36.8);
   console.log("distance lengkung", jarak.toFixed(2));
 
   return jarak
@@ -2520,12 +2593,12 @@ async function getOngoingTestParticipants() {
             age: getAge(x.birthDate),
             number: x.participant_number,
             code: x.code,
-            //isWeared: false,
-            //isOnline: STORE.some((y) => y == x.devId).value(),
-            //isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
-            isWeared: true,
-            isOnline: true,
-            isGpsReady: true,
+            isWeared: false,
+            isOnline: STORE.some((y) => y == x.devId).value(),
+            isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
+            //isWeared: true,
+            //isOnline: true,
+            //isGpsReady: true,
             isFinished: x.finished,
             battery: null,
             heartRate: null,

@@ -145,9 +145,11 @@ function parse(dataIn, ch) {
   if (dataIn[0] != 0xa0) return;
   if (dataIn[3] == 0x89 || dataIn[3] == 0x8a) {
     dat = packetUtils.arrayToByte(dataIn, 4);
+    //console.log("dat:", dat);
     var time = Date.now();
     var freq = (dat >> 2) & 0x03f;
     var ant = (dat & 0x03) + 1;
+    //console.log("ant:", ant);
     var id = dataIn.subarray(7, 19);
     listCardActive = new ListCard(ch, id, time, ant, freq);
     listCardActive.init();
@@ -225,7 +227,7 @@ function sendMQTT(i, j) {
     console.log("Print Reader:", reader);
 	//console.log(typeof reader);
 	//console.log(isTrue);
-	if ((reader == 2) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
+	if ((reader == 2) || (reader == 3) || (reader == 4) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
 		isTrue = true;
 		clientmqtt.publish(`chip/${Idchip}/${participantId}`, reader.toString(), function (err) {
 			if (err) {
