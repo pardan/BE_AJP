@@ -2263,8 +2263,7 @@ async function finishTest() {
         // Create a function that performs the database query and returns a Promise
         function fetchDataFromDB() {
           return new Promise((resolve, reject) => {
-            DB.all("SELECT centerlaplat,centerlaplon,headingcentertorf FROM readers ORDER BY readerId ASC",
-            (error, rows) => {
+            DB.all("SELECT centerlaplat, centerlaplon, headingcentertorf FROM readers ORDER BY readerId ASC", (error, rows) => {
               if (error) {
                 console.error(error);
                 reject(error);
@@ -2286,139 +2285,147 @@ async function finishTest() {
         // Call the function to fetch data
         fetchDataFromDB()
           .then(() => {
-             headingpeserta = calculateHeading1(centerlaplat[0], centerlaplon[0], lastlat, lastlon)
+            headingpeserta = calculateHeading1(centerlaplat[0], centerlaplon[0], lastlat, lastlon);
+            console.log("HEADING PESERTA : ", headingpeserta);
 
-             if (0 < headingpeserta < allheading[3]) {
-              actual_reader = 4
-             } else if (allheading[3] < headingpeserta < allheading[2]) {
-              actual_reader = 3
-            } else if (allheading[2] < headingpeserta < allheading[1]) {
-              actual_reader = 2
-            } else if (allheading[1] < headingpeserta < allheading[0]) {
-              actual_reader = 1
-            } else if (allheading[0] < headingpeserta < 360) {
-              actual_reader = 4
+            if ((0 < headingpeserta) && (headingpeserta < allheading[3])) {
+              actual_reader = 4;
+              console.log("INI YANG 4-1");
+            } else if ((allheading[3] < headingpeserta) && (headingpeserta < allheading[2])) {
+              actual_reader = 3;
+            } else if ((allheading[2] < headingpeserta) && (headingpeserta < allheading[1])) {
+              actual_reader = 2;
+            } else if ((allheading[1] < headingpeserta) && (headingpeserta < allheading[0])) {
+              actual_reader = 1;
+            } else if ((allheading[0] < headingpeserta) && (headingpeserta < 360)) {
+              actual_reader = 4;
+              console.log("INI YANG 4-2");
             }
+
+            console.log("Actual Header : ", actual_reader);
+
+            // Chain the second query to ensure it's executed after the first one
+            return new Promise((resolve, reject) => {
+              console.log("ACTUAL SEBELUM DB.ALL : ", actual_reader);
+              DB.all("SELECT * FROM readers WHERE readerId = ?", [actual_reader], (error, rows) => {
+                if (error) {
+                  console.error(error);
+                  reject(error);
+                } else {
+                  latrf = rows.map(row => row.latitude);
+                  lonrf = rows.map(row => row.longitude);
+                  latcen = rows.map(row => row.centerlatitude);
+                  loncen = rows.map(row => row.centerlongitude);
+                  resolve([latrf, lonrf, latcen, loncen]);
+                }
+              });
+            });
+          })
+          .then(latlonrfData => {
+            // Here, latlonrfData contains the resolved data from the second query
+            const [latrf, lonrf, latcen, loncen] = latlonrfData;
+            console.log("latrf:", latrf);
+            console.log("lonrf:", lonrf);
+            console.log("latcen:", latcen);
+            console.log("loncen:", loncen);
+
+            console.log("LAST READER : ", lastreader);
+            console.log("ACTUAL READER : ", actual_reader);
+
+            if (lastreader == 1) {
+              if (actual_reader == 2) {
+                distance = p.distance + 84.39;
+              } else if (actual_reader == 3) {
+                distance = p.distance + 200;
+              } else if (actual_reader == 4) {
+                distance = p.distance + 284.39;
+              } else {
+                distance = p.distance;
+              }
+            } else if (lastreader == 2) {
+              if (actual_reader == 2) {
+                distance = p.distance;
+              } else if (actual_reader == 3) {
+                distance = p.distance + 115.61;
+              } else if (actual_reader == 4) {
+                distance = p.distance + 200;
+              } else {
+                distance = p.distance + 315.61;
+              }
+            } else if (lastreader == 3) {
+              if (actual_reader == 2) {
+                distance = p.distance + 284.39;
+              } else if (actual_reader == 3) {
+                distance = p.distance;
+              } else if (actual_reader == 4) {
+                distance = p.distance + 84.39;
+              } else {
+                distance = p.distance + 200;
+              }
+            } else if (lastreader == 4) {
+              if (actual_reader == 2) {
+                distance = p.distance + 200;
+              } else if (actual_reader == 3) {
+                distance = p.distance + 315.61;
+              } else if (actual_reader == 4) {
+                distance = p.distance;
+              } else {
+                distance = p.distance + 115.61;
+              }
+            }
+
+            distance = parseFloat(distance);
+            console.log("DISTANCE : ", distance);
+            lastreader = actual_reader;
+            console.log("latcen : ", latcen);
+            console.log("loncen : ", loncen);
+
+            if ((lastreader == 2) || (lastreader == 4)) {
+              distance = distance + hasilakhirlengkung(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
+              distance = distance.toFixed(2);
+              console.log("distance + hasil lengkung", distance);
+            } else {
+              distance = distance + hasilakhirlurus(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon);
+              distance = distance.toFixed(2);
+              console.log("distance + hasil lurus", distance);
+            }
+
+            const score = String(
+              getScore(
+                test.mode,
+                p.gender,
+                distance,
+                ongoingTimer,
+                getAge(p.birthDate)
+              )
+            );
+    
+            //Added By Andri 11 Sept 2020
+            //console.log("OnGoing Timer : ", ongoingTimer);
+    
+            //
+    
+            if (MODE == 1) {
+              return DB.pRun(
+                squel
+                  .update()
+                  .table("test_participants")
+                  .setFields({
+                    distance: distance,
+                    time: ongoingTimer,
+                    finished: 1,
+                    score: score,
+                  })
+                  .where("id = ?", p.id)
+                  .toString()
+              );
+            }
+
           })
           .catch(error => {
             // Handle any errors that occur during the database query
             console.error("Error:", error);
           });
-
-
-
-        const latlonrf = new Promise((resolve, reject) => {
-          DB.all(
-            "SELECT * FROM readers WHERE readerId = ?",
-            [lastreader],
-            (error, rows) => {
-              if (error) {
-                console.error(error);
-                reject(error);
-              } else {
-                latrf = rows.map(row => row.latitude);
-                lonrf = rows.map(row => row.longitude);
-                latcen = rows.map(row => row.centerlatitude);
-                loncen = rows.map(row => row.centerlongitude);
-                latlap = rows.map(row => row.centerlaplat);
-                lonlap = rows.map(row => row.centerlaplon);
-                resolve([latrf,lonrf,latcen,loncen,latlap,lonlap])
-              }
-            }
-          );
-        });
-        await latlonrf.then(([latrf, lonrf, latcen, loncen, latlap, lonlap]) => {
-          console.log("latitude rfid", parseFloat(latrf));
-          console.log("longitude rfid", parseFloat(lonrf));
-          console.log("lat center", parseFloat(latcen));
-          console.log("lon center", parseFloat(loncen));
-
-          if (lastreader == 1){
-
-            if(actual_reader == 2){
-              distance = p.distance + 84.39;
-            } else if(actual_reader == 3){
-              distance = p.distance + 200;
-            } else if(actual_reader == 4){
-              distance = p.distance + 284.39;
-            } else {
-              distance = p.distance;
-            }
-
-          } else if (lastreader == 2){
-            if(actual_reader == 2){
-              distance = p.distance;
-            } else if(actual_reader == 3){
-              distance = p.distance + 115.61;
-            } else if(actual_reader == 4){
-              distance = p.distance + 200;
-            } else {
-              distance = p.distance + 315.61;
-            } 
-          } else if (lastreader == 3){
-            if(actual_reader == 2){
-              distance = p.distance + 284.39;
-            } else if(actual_reader == 3){
-              distance = p.distance;
-            } else if(actual_reader == 4){
-              distance = p.distance + 84.39;
-            } else {
-              distance = p.distance + 200;
-            }
-          } else if (lastreader == 4){
-            if(actual_reader == 2){
-              distance = p.distance + 200;
-            } else if(actual_reader == 3){
-              distance = p.distance + 315.61;
-            } else if(actual_reader == 4){
-              distance = p.distance;
-            } else {
-              distance = p.distance + 115.61;
-            }
-          }
-
-          if ((lastreader == 2) || (lastreader == 4)) {
-            distance = distance + hasilakhirlengkung(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
-            distance = distance.toFixed(2);
-            console.log("distance + hasil lengkung", distance);
-          } else {
-            distance = distance + hasilakhirlurus(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon);
-            distance = distance.toFixed(2);
-            console.log("distance + hasil lurus", distance);
-          }
-
-        });
-
-        const score = String(
-          getScore(
-            test.mode,
-            p.gender,
-            distance,
-            ongoingTimer,
-            getAge(p.birthDate)
-          )
-        );
-
-        //Added By Andri 11 Sept 2020
-        //console.log("OnGoing Timer : ", ongoingTimer);
-
-        //
-
-        if (MODE == 1) {
-          return DB.pRun(
-            squel
-              .update()
-              .table("test_participants")
-              .setFields({
-                distance: distance,
-                time: ongoingTimer,
-                finished: 1,
-                score: score,
-              })
-              .where("id = ?", p.id)
-              .toString()
-          );
-        }
       })
     );
 
@@ -2452,7 +2459,7 @@ async function finishTest() {
 //lat2 dan long 2 = Posisi Peserta Terakhir
 //lat center long center = center point mengambil dari tabel Reader
 function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
-  
+  console.log("ALL DATA: ", lat1, lon1, lat2, lon2, latcenter, loncenter);
   const heading1 = calculateHeading1(latcenter, loncenter, lat1, lon1);
   const heading2 = calculateHeading2(latcenter, loncenter, lat2, lon2);
   console.log("Heading 1", heading1);
@@ -2465,7 +2472,9 @@ function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
     console.log("Revisi Minus", selisih);
   }
 
-  const jarak = (selisih / 360) * (2 * 3.14 * 36.8);
+  const jarak = (parseFloat(selisih) / 360) * (2 * 3.14 * 36.8);
+  console.log("SELISIH DILUAR IF :",selisih)
+  console.log("TEST JARAK: ",jarak)
   console.log("Distance Lengkung", jarak.toFixed(2));
 
   return jarak
@@ -2688,12 +2697,12 @@ async function getOngoingTestParticipants() {
             age: getAge(x.birthDate),
             number: x.participant_number,
             code: x.code,
-            isWeared: false,
-            isOnline: STORE.some((y) => y == x.devId).value(),
-            isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
-            //isWeared: true,
-            //isOnline: true,
-            //isGpsReady: true,
+            //isWeared: false,
+            //isOnline: STORE.some((y) => y == x.devId).value(),
+            //isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
+            isWeared: true,
+            isOnline: true,
+            isGpsReady: true,
             isFinished: x.finished,
             battery: null,
             heartRate: null,
