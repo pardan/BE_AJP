@@ -928,6 +928,7 @@ const onChip = onMessage.pipe(
 
       const pointReader = parseInt(data[1].toString());
       console.log("Received pointReader:", pointReader);
+      console.log("");
       switch (pointReader) {
         case 1:
           let ke1 = 0.0;
@@ -944,6 +945,7 @@ const onChip = onMessage.pipe(
                 } else {
                   let distances1 = rows.map(row => row.distance);
                   let lastreader1 = rows.map(row => row.lastreader);
+                  console.log("LAST READER: ",lastreader1)
                   if (lastreader1 == 4) {
                     ke1 = parseFloat(distances1) + 115.61;
                     console.log("hasil akhir", ke1);
@@ -2247,6 +2249,8 @@ async function finishTest() {
         let distance = p.distance;
 
         let lastreader = p.lastreader;
+        let actualcp1 = 0;
+        let actualcp2 = 0;
         let actual_reader = 0;
         let lastlat = p.lastlat;
         let lastlon = p.lastlon;
@@ -2254,25 +2258,36 @@ async function finishTest() {
         let lonrf = 0.0;
         let latcen = 0.0;
         let loncen = 0.0;
-        let headingpeserta = 0.0;
+        let headingpesertacp1 = 0.0;
+        let headingpesertacp2 = 0.0;
 
         const centerlaplat = [];
         const centerlaplon = [];
         const allheading = [];
+        const allrflat = [];
+        const allrflon = [];
+        const allcplat = [];
+        const allcplon = [];
         
         // Create a function that performs the database query and returns a Promise
         function fetchDataFromDB() {
           return new Promise((resolve, reject) => {
-            DB.all("SELECT centerlaplat, centerlaplon, headingcentertorf FROM readers ORDER BY readerId ASC", (error, rows) => {
+            DB.all("SELECT * FROM readers ORDER BY readerId ASC", (error, rows) => {
               if (error) {
                 console.error(error);
                 reject(error);
               } else {
                 // Iterate through the rows and push data into respective arrays
                 rows.forEach(row => {
-                  allheading.push(row.headingcentertorf);
-                  centerlaplat.push(row.centerlaplat);
-                  centerlaplon.push(row.centerlaplon);
+                  //allheading.push(row.headingcentertorf);
+                  //centerlaplat.push(row.centerlaplat);
+                  //centerlaplon.push(row.centerlaplon);
+
+                  allrflat.push(row.latitude)
+                  allrflon.push(row.longitude)
+                  allcplat.push(row.centerlatitude)
+                  allcplon.push(row.centerlongitude)
+
                 });
 
                 // Resolve the Promise
@@ -2285,28 +2300,54 @@ async function finishTest() {
         // Call the function to fetch data
         fetchDataFromDB()
           .then(() => {
-            headingpeserta = calculateHeading1(centerlaplat[0], centerlaplon[0], lastlat, lastlon);
-            console.log("HEADING PESERTA : ", headingpeserta);
+            headingpesertacp1 = calculateHeading1(allcplat[1], allcplon[1], lastlat, lastlon);
+            headingpesertacp2 = calculateHeading1(allcplat[3], allcplon[3], lastlat, lastlon);
+            hitung0 = calculateHeading1(allrflat[2], allrflon[2], allrflat[3], allrflon[3]);
+            hitung0 = parseFloat(hitung0);
+            console.log("");
+            console.log("HEADING PESERTA DARI CP1: ", headingpesertacp1);
+            console.log("HEADING PESERTA DARI CP2: ", headingpesertacp2);
 
-            if ((0 < headingpeserta) && (headingpeserta < allheading[3])) {
-              actual_reader = 4;
-              console.log("INI YANG 4-1");
-            } else if ((allheading[3] < headingpeserta) && (headingpeserta < allheading[2])) {
-              actual_reader = 3;
-            } else if ((allheading[2] < headingpeserta) && (headingpeserta < allheading[1])) {
-              actual_reader = 2;
-            } else if ((allheading[1] < headingpeserta) && (headingpeserta < allheading[0])) {
-              actual_reader = 1;
-            } else if ((allheading[0] < headingpeserta) && (headingpeserta < 360)) {
-              actual_reader = 4;
-              console.log("INI YANG 4-2");
+            //PERHITUNGAN CP 1
+            if ((headingpesertacp1 > hitung0) && (headingpesertacp1 < hitung0+90)) {
+              actualcp1 = 3;
+            } else if ((headingpesertacp1 > hitung0+90) && (headingpesertacp1 < hitung0+270)) {
+              actualcp1 = 2;
+            } else if ((headingpesertacp1 > hitung0+270) && (headingpesertacp1 < 360)) {
+              actualcp1 = 1;
             }
 
-            console.log("Actual Header : ", actual_reader);
+            //PERHITUNGAN CP 2
+            if ((headingpesertacp2 > hitung0+270) && (headingpesertacp2 < 360)) {
+              actualcp2 = 4;
+            } else if ((headingpesertacp2 > hitung0) && (headingpesertacp2 < hitung0+90)) {
+              actualcp2 = 4;
+            } else if ((headingpesertacp2 > hitung0+90) && (headingpesertacp2 < hitung0+180)) {
+              actualcp2 = 3;
+            } else if ((headingpesertacp2 > hitung0+180) && (headingpesertacp2 < hitung0+270)) {
+              actualcp2 = 1;
+            }
+
+            console.log("ACTUAL CP1 : " ,actualcp1)
+            console.log("ACTUAL CP2 : ",actualcp2)
+
+            //RUMUS PENENTUAN HASIL DARI CP1 & CP2
+            if (actualcp1 != actualcp2){
+              if ((actualcp1 == 2) || (actualcp1 == 4)) {
+                actual_reader = actualcp1;
+                
+              } else if ((actualcp2 == 2) || (actualcp2 == 4)) {
+                actual_reader = actualcp2
+              }
+            } else {
+              actual_reader = actualcp1
+            }
+
+            //console.log("Actual Reader : ", actual_reader);
 
             // Chain the second query to ensure it's executed after the first one
             return new Promise((resolve, reject) => {
-              console.log("ACTUAL SEBELUM DB.ALL : ", actual_reader);
+              //console.log("ACTUAL SEBELUM DB.ALL : ", actual_reader);
               DB.all("SELECT * FROM readers WHERE readerId = ?", [actual_reader], (error, rows) => {
                 if (error) {
                   console.error(error);
@@ -2324,10 +2365,10 @@ async function finishTest() {
           .then(latlonrfData => {
             // Here, latlonrfData contains the resolved data from the second query
             const [latrf, lonrf, latcen, loncen] = latlonrfData;
-            console.log("latrf:", latrf);
-            console.log("lonrf:", lonrf);
-            console.log("latcen:", latcen);
-            console.log("loncen:", loncen);
+            //console.log("latrf:", latrf);
+            //console.log("lonrf:", lonrf);
+            //console.log("latcen:", latcen);
+            //console.log("loncen:", loncen);
 
             console.log("LAST READER : ", lastreader);
             console.log("ACTUAL READER : ", actual_reader);
@@ -2342,6 +2383,7 @@ async function finishTest() {
               } else {
                 distance = p.distance;
               }
+
             } else if (lastreader == 2) {
               if (actual_reader == 2) {
                 distance = p.distance;
@@ -2352,6 +2394,7 @@ async function finishTest() {
               } else {
                 distance = p.distance + 315.61;
               }
+
             } else if (lastreader == 3) {
               if (actual_reader == 2) {
                 distance = p.distance + 284.39;
@@ -2362,6 +2405,7 @@ async function finishTest() {
               } else {
                 distance = p.distance + 200;
               }
+
             } else if (lastreader == 4) {
               if (actual_reader == 2) {
                 distance = p.distance + 200;
@@ -2459,7 +2503,7 @@ async function finishTest() {
 //lat2 dan long 2 = Posisi Peserta Terakhir
 //lat center long center = center point mengambil dari tabel Reader
 function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
-  console.log("ALL DATA: ", lat1, lon1, lat2, lon2, latcenter, loncenter);
+  //console.log("ALL DATA: ", lat1, lon1, lat2, lon2, latcenter, loncenter);
   const heading1 = calculateHeading1(latcenter, loncenter, lat1, lon1);
   const heading2 = calculateHeading2(latcenter, loncenter, lat2, lon2);
   console.log("Heading 1", heading1);
@@ -2468,13 +2512,15 @@ function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
   console.log("Selisih Heading", selisih);
 
   if (selisih < 0) {
-    selisih = heading1+(360-heading2)
-    console.log("Revisi Minus", selisih);
+    console.log("HEADING RF :" ,heading1)
+    console.log("HEADING PESERTA : ",heading2)
+    selisih = (parseFloat(heading1) + (360 - heading2));
+    console.log("HASIL REVISI : ",selisih);
   }
 
   const jarak = (parseFloat(selisih) / 360) * (2 * 3.14 * 36.8);
-  console.log("SELISIH DILUAR IF :",selisih)
-  console.log("TEST JARAK: ",jarak)
+  //console.log("SELISIH DILUAR IF :",selisih)
+  //console.log("TEST JARAK: ",jarak)
   console.log("Distance Lengkung", jarak.toFixed(2));
 
   return jarak
@@ -2697,12 +2743,12 @@ async function getOngoingTestParticipants() {
             age: getAge(x.birthDate),
             number: x.participant_number,
             code: x.code,
-            //isWeared: false,
-            //isOnline: STORE.some((y) => y == x.devId).value(),
-            //isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
-            isWeared: true,
-            isOnline: true,
-            isGpsReady: true,
+            isWeared: false,
+            isOnline: STORE.some((y) => y == x.devId).value(),
+            isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
+            //isWeared: true,
+            //isOnline: true,
+            //isGpsReady: true,
             isFinished: x.finished,
             battery: null,
             heartRate: null,
