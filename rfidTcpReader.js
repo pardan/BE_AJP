@@ -227,7 +227,7 @@ function sendMQTT(i, j) {
     console.log("Print Reader:", reader);
 	//console.log(typeof reader);
 	//console.log(isTrue);
-	if ((reader == 2) || (reader == 3) || (reader == 4) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
+	if ((reader == 3) || (reader == 4) || (reader == 1) || (isTrue == true)) { // Check if it's Reader 2 and isTrue is false
 		isTrue = true;
 		clientmqtt.publish(`chip/${Idchip}/${participantId}`, reader.toString(), function (err) {
 			if (err) {
@@ -235,7 +235,7 @@ function sendMQTT(i, j) {
 			}
 		});
 	} else {
-		console.log('Belum Melewati Reader 2');
+		console.log('Belum Melewati Reader 3');
 	}
   } else {
     //console.log("Print false or no data match ");
