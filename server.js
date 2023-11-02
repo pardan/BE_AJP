@@ -955,6 +955,9 @@ const onChip = onMessage.pipe(
                   } else if(lastreader1 == 2) {
                     ke1 = parseFloat(distances1) + 315.61;
                     console.log("hasil akhir", ke1);
+                  } else if(lastreader1 == 0) {
+                    ke1 = parseFloat(distances1) + 315.61;
+                    console.log("hasil akhir", ke1);
                   } else {
                     ke1 = parseFloat(distances1) + 400;
                     console.log("hasil akhir", ke1);
@@ -1011,7 +1014,7 @@ const onChip = onMessage.pipe(
                     ke2 = parseFloat(distances2) + 284.39;
                     console.log("hasil akhir", ke2);
                   } else if(lastreader2 == 0){
-                    ke2 = parseFloat(distances2) + 84.39;
+                    ke2 = parseFloat(distances2) + 400;
                     console.log("hasil akhir", ke2);
                   } else {
                     ke2 = parseFloat(distances2) + 400;
@@ -1068,9 +1071,9 @@ const onChip = onMessage.pipe(
                     ke3 = parseFloat(distances3) + 315.61;
                     console.log("hasil akhir rumus 3", ke3);
                   } else if(lastreader3 == 0){
-                    ke3 = parseFloat(distances3) + 200;
+                    ke3 = parseFloat(distances3) + 115.61;
                     console.log("hasil akhir rumus 4", ke3);
-                  }  else {
+                  } else {
                     ke3 = parseFloat(distances3) + 400;
                     console.log("hasil akhir rumus 5", ke3);
                   }
@@ -1125,7 +1128,7 @@ const onChip = onMessage.pipe(
                     ke4 = parseFloat(distances4) + 284.39;
                     console.log("hasil akhir", ke4);
                   } else if(lastreader4 == 0){
-                    ke4 = parseFloat(distances4) + 284.39;
+                    ke4 = parseFloat(distances4) + 200;
                     console.log("hasil akhir", ke4);
                   }  else {
                     ke4 = parseFloat(distances4) + 400;
