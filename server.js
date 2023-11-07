@@ -11,6 +11,7 @@ const FileSync = require("lowdb/adapters/FileSync");
 const squel = require("squel");
 
 const { getPathLength } = require("geolib");
+const { Agent } = require("https");
 
 require("dayjs/locale/id");
 // END  IMPORT -
@@ -3423,22 +3424,230 @@ function getScore2400(gender, age, time) {
   }
 }
 
-function getScore(mode, gender, distance, time = null, age = null) {
+function calculateScoreMale(age, totalDistance) {
+  if (age >= 18 && age <= 25) {
+    let score = 100;
+    let distance = 3507;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 26 && age <= 30) {
+    let score = 100;
+    let distance = 3412;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 31 && age <= 35) {
+    let score = 100;
+    let distance = 3317;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 36 && age <= 40) {
+    let score = 100;
+    let distance = 3222;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 41 && age <= 43) {
+    let score = 100;
+    let distance = 3127;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 44 && age <= 46) {
+    let score = 100;
+    let distance = 3032;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 47 && age <= 49) {
+    let score = 100;
+    let distance = 2937;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 50 && age <= 52) {
+    let score = 100;
+    let distance = 2842;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 53 && age <= 55) {
+    let score = 100;
+    let distance = 2747;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else if (age >= 56 && age <= 58) {
+    let score = 100;
+    let distance = 2652;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+    
+    return score;
+  } else {
+    return 0; // Age is outside all specified ranges, so the score is 0
+  }
+}
+
+function calculateScoreFemale(age, totalDistance) {
+  if (age >= 18 && age <= 25) {
+    let score = 100;
+    let distance = 2630;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 26 && age <= 30) {
+    let score = 100;
+    let distance = 2575;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 31 && age <= 35) {
+    let score = 100;
+    let distance = 2520;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 36 && age <= 40) {
+    let score = 100;
+    let distance = 2465;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 41 && age <= 43) {
+    let score = 100;
+    let distance = 2410;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 44 && age <= 46) {
+    let score = 100;
+    let distance = 2355;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 47 && age <= 49) {
+    let score = 100;
+    let distance = 2300;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 50 && age <= 52) {
+    let score = 100;
+    let distance = 2245;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 53 && age <= 55) {
+    let score = 100;
+    let distance = 2190;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else if (age >= 56 && age <= 58) {
+    let score = 100;
+    let distance = 2135;
+
+    while (distance > totalDistance && score > 0) {
+      distance -= 19;
+      score--;
+    }
+
+    return score;
+  } else {
+    return 0; // Age is outside all specified ranges, so the score is 0
+  }
+}
+
+function getScore(mode, gender, distance, time = null, age) {
   const map = new Map([
     [
       1,
       new Map([
         [
           "MALE",
-          distance >= 3444
-            ? 100
-            : 67 + (distance >= 2745 ? Math.floor((distance - 2745) / 21) : 0),
+          calculateScoreMale(age,distance),
         ],
         [
           "FEMALE",
-          distance >= 3095
-            ? 100
-            : 67 + (distance >= 2407 ? Math.floor((distance - 2407) / 21) : 0),
+          calculateScoreFemale(age,distance),
         ],
       ]),
     ],
