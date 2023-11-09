@@ -665,6 +665,8 @@ DB.serialize(() => DB_SCHEMA.forEach((sql) => DB.run(sql)));
 
 server.listen(4000, "0.0.0.0").then(onServerListening);
 
+client.setMaxListeners(100);
+
 const onConnect = fromEvent(client, "connect");
 const onMessage = fromEvent(client, "message");
 
@@ -2095,7 +2097,25 @@ async function cancelTest(_, { id }) {
         .update()
         .table("tests")
         .set("status", "CANCELED")
+        .set("startTimestamp", null)
+        .set("finishTimestamp", null)
         .where("id = ?", id)
+        .toString()
+    );
+
+    await DB.pRun(
+      squel
+        .update()
+        .table("test_participants")
+        .set("distance", 0.0)
+        .set("time", null)
+        .set("finished", null)
+        .set("score", null)
+        .set("lastlat", null)
+        .set("lastlon", null)
+        .set("lastreader", 0)
+        .set("temp_distance", 0.0)
+        .where("test_id = ?", id)
         .toString()
     );
 
