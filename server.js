@@ -1670,7 +1670,8 @@ async function getTest(_, { id }) {
         LEFT JOIN
           chips c ON tp.chip_id = c.id
         WHERE test_id = ?
-        GROUP BY tp.id`,
+        GROUP BY tp.id
+        ORDER BY deviceId`,
         [test.id],
         (err, rows) => {
           if (err) reject(err);
