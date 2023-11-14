@@ -2090,6 +2090,16 @@ function beginTest(_, { testId }) {
 }
 
 async function cancelTest(_, { id }) {
+  if (currentTimer !== null) {
+    currentTimer.unsubscribe();
+    currentTimer = null;
+  }
+
+  if (currentTimer2 !== null) {
+    currentTimer2.unsubscribe();
+    currentTimer2 = null;
+  }
+
   try {
     const ongoingParticipants = await DB.pAll(Q_GET_ONGOING_PARTICIPANTS);
 
@@ -2755,7 +2765,8 @@ async function getOngoingTestParticipants() {
             FROM test_participants tp
             JOIN participants p ON p.id = tp.participant_id
             JOIN devices d ON d.id = tp.device_id   
-            WHERE test_id = ? AND canceled = 0`,
+            WHERE test_id = ? AND canceled = 0
+            ORDER BY tp.participant_number`,
       [test.id],
       function (err, rows) {
         if (err) reject(err);
@@ -2768,12 +2779,12 @@ async function getOngoingTestParticipants() {
             age: getAge(x.birthDate),
             number: x.participant_number,
             code: x.code,
-            isWeared: false,
-            isOnline: STORE.some((y) => y == x.devId).value(),
-            isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
-            //isWeared: true,
-            //isOnline: true,
-            //isGpsReady: true,
+            //isWeared: false,
+            //isOnline: STORE.some((y) => y == x.devId).value(),
+            //isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
+            isWeared: true,
+            isOnline: true,
+            isGpsReady: true,
             isFinished: x.finished,
             battery: null,
             heartRate: null,
@@ -3207,6 +3218,7 @@ async function getTestParticipantResults(_, { id = null }) {
             LEFT JOIN devices d ON tp.device_id = d.id
             WHERE test_id = ?
             GROUP BY tp.id
+            ORDER BY tp.participant_number
         `;
 
       const testParticipants = await new Promise((resolve, reject) => {
