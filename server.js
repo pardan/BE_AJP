@@ -976,8 +976,8 @@ const onChip = onMessage.pipe(
           // Wait for the promise to resolve before executing the update
           updateDistancePromise1.then(updatedDistance1 => {
             DB.run(
-              "UPDATE test_participants SET distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance1, testParticipantId, chipId],
+              "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              [updatedDistance1, updatedDistance1, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
@@ -1034,8 +1034,8 @@ const onChip = onMessage.pipe(
           // Wait for the promise to resolve before executing the update
           updateDistancePromise2.then(updatedDistance2 => {
             DB.run(
-              "UPDATE test_participants SET distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance2, testParticipantId, chipId],
+              "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              [updatedDistance2, updatedDistance2, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
@@ -1091,8 +1091,8 @@ const onChip = onMessage.pipe(
           // Wait for the promise to resolve before executing the update
           updateDistancePromise3.then(updatedDistance3 => {
             DB.run(
-              "UPDATE test_participants SET distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance3, testParticipantId, chipId],
+              "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              [updatedDistance3, updatedDistance3, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
@@ -1148,8 +1148,8 @@ const onChip = onMessage.pipe(
           // Wait for the promise to resolve before executing the update
           updateDistancePromise4.then(updatedDistance4 => {
             DB.run(
-              "UPDATE test_participants SET distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance4, testParticipantId, chipId],
+              "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
+              [updatedDistance4, updatedDistance4, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
@@ -2779,12 +2779,12 @@ async function getOngoingTestParticipants() {
             age: getAge(x.birthDate),
             number: x.participant_number,
             code: x.code,
-            //isWeared: false,
-            //isOnline: STORE.some((y) => y == x.devId).value(),
-            //isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
-            isWeared: true,
-            isOnline: true,
-            isGpsReady: true,
+            isWeared: false,
+            isOnline: STORE.some((y) => y == x.devId).value(),
+            isGpsReady: ST_GPS.some((y) => y == x.devId).value(),
+            //isWeared: true,
+            //isOnline: true,
+            //isGpsReady: true,
             isFinished: x.finished,
             battery: null,
             heartRate: null,
