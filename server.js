@@ -893,7 +893,7 @@ onGPS.subscribe((gpsData) => {
             gps.latitude,
             gps.longitude,
             gps.accuracy,
-            gps.distance,
+            gps.temp_distance,
             gps.lastDistance,
           ],
           function (err) {
@@ -975,20 +975,48 @@ const onChip = onMessage.pipe(
 
           // Wait for the promise to resolve before executing the update
           updateDistancePromise1.then(updatedDistance1 => {
+            // Update test_participants table
             DB.run(
               "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance1, updatedDistance1, testParticipantId, chipId],
+              [updatedDistance1, 0, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
                 } else {
                   console.log("Distance updated successfully");
                   console.log(updatedDistance1);
+          
+                  // Add the query to retrieve devId
+                  DB.get(
+                    "SELECT devId FROM devices WHERE id = (SELECT device_id FROM test_participants WHERE id = ?)",
+                    [testParticipantId],
+                    (error, result) => {
+                      if (error) {
+                        console.error("Error retrieving devId:", error);
+                      } else {
+                        // Check if devId is found
+                        if (result && result.devId) {
+                          const devId = result.devId;
+          
+                          // Find GPS_LOG with id and remove its entry
+                          const gpsLogEntryIndex = GPS_LOG.findIndex({ id: devId });
+                          if (gpsLogEntryIndex !== -1) {
+                            GPS_LOG.remove({ id: devId }).write();
+                            console.log("GPS_LOG entry removed successfully");
+                          } else {
+                            console.log("GPS_LOG entry not found for devId:", devId);
+                          }
+                        } else {
+                          console.log("No devId found for the given testParticipantId:", testParticipantId);
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
           });
-
+          
           break;
 
         case 2:
@@ -1035,13 +1063,40 @@ const onChip = onMessage.pipe(
           updateDistancePromise2.then(updatedDistance2 => {
             DB.run(
               "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance2, updatedDistance2, testParticipantId, chipId],
+              [updatedDistance2, 0, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
                 } else {
                   console.log("Distance updated successfully");
                   console.log(updatedDistance2);
+          
+                  // Add the query to retrieve devId
+                  DB.get(
+                    "SELECT devId FROM devices WHERE id = (SELECT device_id FROM test_participants WHERE id = ?)",
+                    [testParticipantId],
+                    (error, result) => {
+                      if (error) {
+                        console.error("Error retrieving devId:", error);
+                      } else {
+                        // Check if devId is found
+                        if (result && result.devId) {
+                          const devId = result.devId;
+          
+                          // Find GPS_LOG with id and remove its entry
+                          const gpsLogEntryIndex = GPS_LOG.findIndex({ id: devId });
+                          if (gpsLogEntryIndex !== -1) {
+                            GPS_LOG.remove({ id: devId }).write();
+                            console.log("GPS_LOG entry removed successfully");
+                          } else {
+                            console.log("GPS_LOG entry not found for devId:", devId);
+                          }
+                        } else {
+                          console.log("No devId found for the given testParticipantId:", testParticipantId);
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
@@ -1092,13 +1147,40 @@ const onChip = onMessage.pipe(
           updateDistancePromise3.then(updatedDistance3 => {
             DB.run(
               "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance3, updatedDistance3, testParticipantId, chipId],
+              [updatedDistance3, 0, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
                 } else {
                   console.log("Distance updated successfully");
                   console.log(updatedDistance3);
+          
+                  // Add the query to retrieve devId
+                  DB.get(
+                    "SELECT devId FROM devices WHERE id = (SELECT device_id FROM test_participants WHERE id = ?)",
+                    [testParticipantId],
+                    (error, result) => {
+                      if (error) {
+                        console.error("Error retrieving devId:", error);
+                      } else {
+                        // Check if devId is found
+                        if (result && result.devId) {
+                          const devId = result.devId;
+          
+                          // Find GPS_LOG with id and remove its entry
+                          const gpsLogEntryIndex = GPS_LOG.findIndex({ id: devId });
+                          if (gpsLogEntryIndex !== -1) {
+                            GPS_LOG.remove({ id: devId }).write();
+                            console.log("GPS_LOG entry removed successfully");
+                          } else {
+                            console.log("GPS_LOG entry not found for devId:", devId);
+                          }
+                        } else {
+                          console.log("No devId found for the given testParticipantId:", testParticipantId);
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
@@ -1149,13 +1231,40 @@ const onChip = onMessage.pipe(
           updateDistancePromise4.then(updatedDistance4 => {
             DB.run(
               "UPDATE test_participants SET distance = ?, temp_distance = ? WHERE id = ? AND chip_id = ? AND (finished = 0 OR finished IS NULL)",
-              [updatedDistance4, updatedDistance4, testParticipantId, chipId],
+              [updatedDistance4, 0, testParticipantId, chipId],
               (error) => {
                 if (error) {
                   console.error("Error updating distance:", error);
                 } else {
                   console.log("Distance updated successfully");
                   console.log(updatedDistance4);
+          
+                  // Add the query to retrieve devId
+                  DB.get(
+                    "SELECT devId FROM devices WHERE id = (SELECT device_id FROM test_participants WHERE id = ?)",
+                    [testParticipantId],
+                    (error, result) => {
+                      if (error) {
+                        console.error("Error retrieving devId:", error);
+                      } else {
+                        // Check if devId is found
+                        if (result && result.devId) {
+                          const devId = result.devId;
+          
+                          // Find GPS_LOG with id and remove its entry
+                          const gpsLogEntryIndex = GPS_LOG.findIndex({ id: devId });
+                          if (gpsLogEntryIndex !== -1) {
+                            GPS_LOG.remove({ id: devId }).write();
+                            console.log("GPS_LOG entry removed successfully");
+                          } else {
+                            console.log("GPS_LOG entry not found for devId:", devId);
+                          }
+                        } else {
+                          console.log("No devId found for the given testParticipantId:", testParticipantId);
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
