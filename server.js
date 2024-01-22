@@ -32,6 +32,8 @@ const SOTKAW = "sotKaw";
 //AS
 var DISTANCE_LIMIT = null;
 var MODE = null;
+var jaraklurus = 0.0;
+var jaraklengkung = 0.0;
 
 const DB_SCHEMA = [
   `PRAGMA foreign_keys = ON`,
@@ -286,6 +288,7 @@ const typeDefs = gql`
 
   type Reader {
     id: ID
+    mode: Int
     codeReader: String
     readerId: String
     latitude: Float
@@ -307,6 +310,7 @@ const typeDefs = gql`
     centerlon2: Float
     cenlaplon: Float
     cenlaplat: Float
+    mode: Int
   }
 
   type TestParticipant {
@@ -932,6 +936,16 @@ const onChip = onMessage.pipe(
       const pointReader = parseInt(data[1].toString());
       console.log("Received pointReader:", pointReader);
       console.log("");
+
+      if (MODE == 1) {
+        jaraklurus = 84.39
+        jaraklengkung = 115.61
+      } else {
+        jaraklurus = 84.39
+        jaraklengkung = 107.1125
+      }
+
+
       switch (pointReader) {
         case 1:
           let ke1 = 0.0;
@@ -950,19 +964,19 @@ const onChip = onMessage.pipe(
                   let lastreader1 = rows.map(row => row.lastreader);
                   console.log("LAST READER: ",lastreader1)
                   if (lastreader1 == 4) {
-                    ke1 = parseFloat(distances1) + 115.61;
+                    ke1 = parseFloat(distances1) + jaraklengkung;
                     console.log("hasil akhir", ke1);
                   } else if(lastreader1 == 3) {
-                    ke1 = parseFloat(distances1) + 200;
+                    ke1 = parseFloat(distances1) + (jaraklengkung + jaraklurus);
                     console.log("hasil akhir", ke1);
                   } else if(lastreader1 == 2) {
-                    ke1 = parseFloat(distances1) + 315.61;
+                    ke1 = parseFloat(distances1) + (jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke1);
                   } else if(lastreader1 == 0) {
-                    ke1 = parseFloat(distances1) + 315.61;
+                    ke1 = parseFloat(distances1) + (jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke1);
                   } else {
-                    ke1 = parseFloat(distances1) + 400;
+                    ke1 = parseFloat(distances1) + (jaraklengkung + jaraklurus + jaraklengkung + jaraklurus);
                     console.log("hasil akhir", ke1);
                   }
 
@@ -1036,19 +1050,19 @@ const onChip = onMessage.pipe(
                   let lastreader2 = rows.map(row => row.lastreader);
                   console.log("LAST READER: ",lastreader2)
                   if (lastreader2 == 1) {
-                    ke2 = parseFloat(distances2) + 84.39;
+                    ke2 = parseFloat(distances2) + jaraklurus;
                     console.log("hasil akhir", ke2);
                   } else if(lastreader2 == 4) {
-                    ke2 = parseFloat(distances2) + 200;
+                    ke2 = parseFloat(distances2) + (jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke2);
                   } else if(lastreader2 == 3) {
-                    ke2 = parseFloat(distances2) + 284.39;
+                    ke2 = parseFloat(distances2) + (jaraklurus + jaraklengkung + jaraklurus);
                     console.log("hasil akhir", ke2);
                   } else if(lastreader2 == 0){
-                    ke2 = parseFloat(distances2) + 400;
+                    ke2 = parseFloat(distances2) + (jaraklurus + jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke2);
                   } else {
-                    ke2 = parseFloat(distances2) + 400;
+                    ke2 = parseFloat(distances2) + (jaraklurus + jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke2);
                   }
 
@@ -1120,19 +1134,19 @@ const onChip = onMessage.pipe(
                   let lastreader3 = rows.map(row => row.lastreader);
                   console.log("LAST READER: ",lastreader3)
                   if (lastreader3 == 2) {
-                    ke3 = parseFloat(distances3) + 115.61;
+                    ke3 = parseFloat(distances3) + jaraklengkung;
                     console.log("hasil akhir rumus 1", ke3);
                   } else if(lastreader3 == 1) {
-                    ke3 = parseFloat(distances3) + 200;
+                    ke3 = parseFloat(distances3) + (jaraklengkung + jaraklurus);
                     console.log("hasil akhir rumus 2", ke3);
                   } else if(lastreader3 == 4) {
-                    ke3 = parseFloat(distances3) + 315.61;
+                    ke3 = parseFloat(distances3) + (jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir rumus 3", ke3);
                   } else if(lastreader3 == 0){
-                    ke3 = parseFloat(distances3) + 115.61;
+                    ke3 = parseFloat(distances3) + jaraklengkung;
                     console.log("hasil akhir rumus 4", ke3);
                   } else {
-                    ke3 = parseFloat(distances3) + 400;
+                    ke3 = parseFloat(distances3) + (jaraklengkung + jaraklurus + jaraklengkung + jaraklurus);
                     console.log("hasil akhir rumus 5", ke3);
                   }
 
@@ -1204,19 +1218,19 @@ const onChip = onMessage.pipe(
                   let distances4 = rows.map(row => row.distance);
                   let lastreader4 = rows.map(row => row.lastreader);
                   if (lastreader4 == 3) {
-                    ke4 = parseFloat(distances4) + 84.39;
+                    ke4 = parseFloat(distances4) + jaraklurus;
                     console.log("hasil akhir", ke4);
                   } else if(lastreader4 == 2) {
-                    ke4 = parseFloat(distances4) + 200;
+                    ke4 = parseFloat(distances4) + (jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke4);
                   } else if(lastreader4 == 1) {
-                    ke4 = parseFloat(distances4) + 284.39;
+                    ke4 = parseFloat(distances4) + (jaraklurus + jaraklengkung + jaraklurus);
                     console.log("hasil akhir", ke4);
                   } else if(lastreader4 == 0){
-                    ke4 = parseFloat(distances4) + 200;
+                    ke4 = parseFloat(distances4) + (jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke4);
                   }  else {
-                    ke4 = parseFloat(distances4) + 400;
+                    ke4 = parseFloat(distances4) + (jaraklurus + jaraklengkung + jaraklurus + jaraklengkung);
                     console.log("hasil akhir", ke4);
                   }
 
@@ -1686,7 +1700,7 @@ function getTests(_, { category = null, mode = null, query = null }) {
       .from("tests", "t")
       .left_join("test_category", "tc", "t.category = tc.id")
       .order(
-        `CASE WHEN status = 'ONGOING' THEN 1 WHEN status = 'PENDING' THEN 2 ELSE 3 END`,
+        `CASE WHEN status = 'ONGOING' THEN 1 WHEN status = 'PENDING' THEN 2 WHEN status = 'CANCELED' THEN 3 ELSE 4 END`,
         true
       );
 
@@ -2066,64 +2080,45 @@ function deleteChip(_, {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function addReader(_, { reader }) {
+async function addReader(_, { reader }) {
+  try {
+    const [headingrf1, headingrf2, headingrf3, headingrf4] = await Promise.all([
+      calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt1, reader.lonn1),
+      calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt2, reader.lonn2),
+      calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt3, reader.lonn3),
+      calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt4, reader.lonn4)
+    ]);
 
-    const headingrf1 = calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt1, reader.lonn1)
-    const headingrf2 = calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt2, reader.lonn2)
-    const headingrf3 = calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt3, reader.lonn3)
-    const headingrf4 = calculateHeading1(reader.cenlaplat, reader.cenlaplon, reader.latt4, reader.lonn4)
+    await Promise.all([
+      runQuery("DELETE FROM readers WHERE mode = ?", [reader.mode]),
+      runQuery("INSERT INTO readers(mode, readerId, codeReader, latitude, longitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?)",
+        [reader.mode, 1, "RFID 1", reader.latt1, reader.lonn1, reader.cenlaplat, reader.cenlaplon, headingrf1]),
+      runQuery("INSERT INTO readers(mode, readerId, codeReader, latitude, longitude, centerlatitude, centerlongitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?,?,?)",
+        [reader.mode, 2, "RFID 2", reader.latt2, reader.lonn2, reader.centerlat1, reader.centerlon1, reader.cenlaplat, reader.cenlaplon, headingrf2]),
+      runQuery("INSERT INTO readers(mode, readerId, codeReader, latitude, longitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?)",
+        [reader.mode, 3, "RFID 3", reader.latt3, reader.lonn3, reader.cenlaplat, reader.cenlaplon, headingrf3]),
+      runQuery("INSERT INTO readers(mode, readerId, codeReader, latitude, longitude, centerlatitude, centerlongitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?,?,?)",
+        [reader.mode, 4, "RFID 4", reader.latt4, reader.lonn4, reader.centerlat2, reader.centerlon2, reader.cenlaplat, reader.cenlaplon, headingrf4]),
+    ]);
 
-    return new Promise((resolve, reject) => {
-        DB.run(
-            "DELETE FROM readers",
-            function (err) {
-              if (err) reject(err);
-      
-              resolve(true);
-            }
-          );
-    
-      DB.run(
-        "INSERT INTO readers(readerId, codeReader, latitude, longitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?)",
-        [1, "RFID 1", reader.latt1, reader.lonn1, reader.cenlaplat, reader.cenlaplon, headingrf1],
-        function (err) {
-          if (err) reject(err);
-  
-          resolve(true);
-        }
-      );
-
-      DB.run(
-        "INSERT INTO readers(readerId, codeReader, latitude, longitude, centerlatitude, centerlongitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?,?)",
-        [2, "RFID 2", reader.latt2, reader.lonn2, reader.centerlat1, reader.centerlon1, reader.cenlaplat, reader.cenlaplon, headingrf2],
-        function (err) {
-          if (err) reject(err);
-  
-          resolve(true);
-        }
-      );
-
-      DB.run(
-        "INSERT INTO readers(readerId, codeReader, latitude, longitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?)",
-        [3, "RFID 3", reader.latt3, reader.lonn3, reader.cenlaplat, reader.cenlaplon, headingrf3],
-        function (err) {
-          if (err) reject(err);
-  
-          resolve(true);
-        }
-      );
-
-      DB.run(
-        "INSERT INTO readers(readerId, codeReader, latitude, longitude, centerlatitude, centerlongitude, centerlaplat, centerlaplon, headingcentertorf) VALUES(?,?,?,?,?,?,?,?,?)",
-        [4, "RFID 4", reader.latt4, reader.lonn4, reader.centerlat2, reader.centerlon2, reader.cenlaplat, reader.cenlaplon, headingrf4],
-        function (err) {
-          if (err) reject(err);
-  
-          resolve(true);
-        }
-      );
-    });
+    return true;
+  } catch (err) {
+    throw err;
   }
+}
+
+function runQuery(query, params) {
+  return new Promise((resolve, reject) => {
+    DB.run(query, params, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+}
+
 
 function beginTest(_, { testId }) {
   const setMode = new Promise((resolve, reject) => {
@@ -2416,7 +2411,7 @@ async function finishTest() {
         // Create a function that performs the database query and returns a Promise
         function fetchDataFromDB() {
           return new Promise((resolve, reject) => {
-            DB.all("SELECT * FROM readers ORDER BY readerId ASC", (error, rows) => {
+            DB.all("SELECT * FROM readers WHERE mode = ? ORDER BY readerId ASC", [MODE], (error, rows) => {
               if (error) {
                 console.error(error);
                 reject(error);
@@ -2448,9 +2443,9 @@ async function finishTest() {
             headingpesertacp2 = calculateHeading1(allcplat[3], allcplon[3], lastlat, lastlon);
             hitung0 = calculateHeading1(allrflat[2], allrflon[2], allrflat[3], allrflon[3]);
             hitung0 = parseFloat(hitung0);
-            console.log("");
-            console.log("HEADING PESERTA DARI CP1: ", headingpesertacp1);
-            console.log("HEADING PESERTA DARI CP2: ", headingpesertacp2);
+            //console.log("");
+            //console.log("HEADING PESERTA DARI CP1: ", headingpesertacp1);
+            //console.log("HEADING PESERTA DARI CP2: ", headingpesertacp2);
 
             //PERHITUNGAN CP 1
             if ((headingpesertacp1 > hitung0) && (headingpesertacp1 < hitung0+90)) {
@@ -2472,8 +2467,8 @@ async function finishTest() {
               actualcp2 = 1;
             }
 
-            console.log("ACTUAL CP1 : " ,actualcp1)
-            console.log("ACTUAL CP2 : ",actualcp2)
+            //console.log("ACTUAL CP1 : " ,actualcp1)
+            //console.log("ACTUAL CP2 : ",actualcp2)
 
             //RUMUS PENENTUAN HASIL DARI CP1 & CP2
             if (actualcp1 != actualcp2){
@@ -2492,7 +2487,7 @@ async function finishTest() {
             // Chain the second query to ensure it's executed after the first one
             return new Promise((resolve, reject) => {
               //console.log("ACTUAL SEBELUM DB.ALL : ", actual_reader);
-              DB.all("SELECT * FROM readers WHERE readerId = ?", [actual_reader], (error, rows) => {
+              DB.all("SELECT * FROM readers WHERE mode = ? AND readerId = ?", [MODE, actual_reader], (error, rows) => {
                 if (error) {
                   console.error(error);
                   reject(error);
@@ -2517,13 +2512,21 @@ async function finishTest() {
             console.log("LAST READER : ", lastreader);
             console.log("ACTUAL READER : ", actual_reader);
 
+            if (MODE == 1) {
+              jaraklurus = 84.39
+              jaraklengkung = 115.61
+            } else {
+              jaraklurus = 84.39
+              jaraklengkung = 107.1125
+            }
+
             if (lastreader == 1) {
               if (actual_reader == 2) {
-                distance = p.distance + 84.39;
+                distance = p.distance + jaraklurus;
               } else if (actual_reader == 3) {
-                distance = p.distance + 200;
+                distance = p.distance + (jaraklurus + jaraklengkung);
               } else if (actual_reader == 4) {
-                distance = p.distance + 284.39;
+                distance = p.distance + (jaraklurus + jaraklengkung + jaraklurus);
               } else {
                 distance = p.distance;
               }
@@ -2532,50 +2535,50 @@ async function finishTest() {
               if (actual_reader == 2) {
                 distance = p.distance;
               } else if (actual_reader == 3) {
-                distance = p.distance + 115.61;
+                distance = p.distance + jaraklengkung;
               } else if (actual_reader == 4) {
-                distance = p.distance + 200;
+                distance = p.distance + (jaraklengkung + jaraklurus);
               } else {
-                distance = p.distance + 315.61;
+                distance = p.distance + (jaraklengkung + jaraklurus + jaraklengkung);
               }
 
             } else if (lastreader == 3) {
               if (actual_reader == 2) {
-                distance = p.distance + 284.39;
+                distance = p.distance + (jaraklurus + jaraklengkung + jaraklurus);
               } else if (actual_reader == 3) {
                 distance = p.distance;
               } else if (actual_reader == 4) {
-                distance = p.distance + 84.39;
+                distance = p.distance + jaraklurus;
               } else {
-                distance = p.distance + 200;
+                distance = p.distance + (jaraklurus + jaraklengkung);
               }
 
             } else if (lastreader == 4) {
               if (actual_reader == 2) {
-                distance = p.distance + 200;
+                distance = p.distance + (jaraklengkung + jaraklurus);
               } else if (actual_reader == 3) {
-                distance = p.distance + 315.61;
+                distance = p.distance + (jaraklengkung + jaraklurus + jaraklengkung);
               } else if (actual_reader == 4) {
                 distance = p.distance;
               } else {
-                distance = p.distance + 115.61;
+                distance = p.distance + jaraklengkung;
               }
             }
 
             distance = parseFloat(distance);
-            console.log("DISTANCE : ", distance);
+            //console.log("DISTANCE : ", distance);
             lastreader = actual_reader;
-            console.log("latcen : ", latcen);
-            console.log("loncen : ", loncen);
+            //console.log("latcen : ", latcen);
+            //console.log("loncen : ", loncen);
 
             if ((lastreader == 2) || (lastreader == 4)) {
-              distance = distance + hasilakhirlengkung(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
+              distance = distance + hasilakhirlengkung(MODE, parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon, parseFloat(latcen), parseFloat(loncen));
               distance = distance.toFixed(2);
-              console.log("distance + hasil lengkung", distance);
+              //console.log("distance + hasil lengkung", distance);
             } else {
               distance = distance + hasilakhirlurus(parseFloat(latrf), parseFloat(lonrf), lastlat, lastlon);
               distance = distance.toFixed(2);
-              console.log("distance + hasil lurus", distance);
+              //console.log("distance + hasil lurus", distance);
             }
 
             const score = String(
@@ -2593,7 +2596,7 @@ async function finishTest() {
     
             //
     
-            if (MODE == 1) {
+            if (MODE == 1 || MODE == 4) {
               return DB.pRun(
                 squel
                   .update()
@@ -2604,7 +2607,7 @@ async function finishTest() {
                     finished: 1,
                     score: score,
                   })
-                  .where("id = ?", p.id)
+                  .where("id = ? and finished is null", p.id)
                   .toString()
               );
             }
@@ -2646,26 +2649,35 @@ async function finishTest() {
 //lat1 dan long 1 = RFID terkahir
 //lat2 dan long 2 = Posisi Peserta Terakhir
 //lat center long center = center point mengambil dari tabel Reader
-function hasilakhirlengkung(lat1, lon1, lat2, lon2, latcenter, loncenter) {
+function hasilakhirlengkung(MODE, lat1, lon1, lat2, lon2, latcenter, loncenter) {
+  let jarijari = 0.0;
+  if (MODE == 1) {
+    jarijari = 36.8;
+  } else {
+    jarijari = 34.095;
+  }
+
+  console.log(MODE, jarijari)
+
   //console.log("ALL DATA: ", lat1, lon1, lat2, lon2, latcenter, loncenter);
   const heading1 = calculateHeading1(latcenter, loncenter, lat1, lon1);
   const heading2 = calculateHeading2(latcenter, loncenter, lat2, lon2);
-  console.log("Heading 1", heading1);
-  console.log("Heading 2", heading2);
+  //console.log("Heading 1", heading1);
+  //console.log("Heading 2", heading2);
   let selisih = heading1 - heading2;
-  console.log("Selisih Heading", selisih);
+  //console.log("Selisih Heading", selisih);
 
   if (selisih < 0) {
-    console.log("HEADING RF :" ,heading1)
-    console.log("HEADING PESERTA : ",heading2)
+    //console.log("HEADING RF :" ,heading1)
+    //console.log("HEADING PESERTA : ",heading2)
     selisih = (parseFloat(heading1) + (360 - heading2));
-    console.log("HASIL REVISI : ",selisih);
+    //console.log("HASIL REVISI : ",selisih);
   }
 
-  const jarak = (parseFloat(selisih) / 360) * (2 * 3.14 * 36.8);
+  const jarak = (parseFloat(selisih) / 360) * (2 * 3.14 * jarijari);
   //console.log("SELISIH DILUAR IF :",selisih)
   //console.log("TEST JARAK: ",jarak)
-  console.log("Distance Lengkung", jarak.toFixed(2));
+  //console.log("Distance Lengkung", jarak.toFixed(2));
 
   return jarak
 }
@@ -3119,7 +3131,8 @@ async function getChartData(_, { mode, start, end }) {
         .from("heart_rate_logs", "hrl")
         .where("hrl.test_participant_id = tp.id"),
       "avg_hr"
-    );
+    )
+    .order("avg_score", false);
 
   const qScoreCountBySatuan = qScoreCount
     .clone()
@@ -3322,7 +3335,8 @@ async function getTestParticipantResults(_, { id = null }) {
                 MAX(hrl.hr_value) as max_hr
             FROM test_participants tp 
             LEFT JOIN heart_rate_logs hrl ON hrl.test_participant_id = tp.id
-            LEFT JOIN gps_logs gl ON gl.test_participant_id = tp.id
+            ------------DISABLE JOIN GPS LOG GATAU BUAT APA
+            --LEFT JOIN gps_logs gl ON gl.test_participant_id = tp.id
             LEFT JOIN participants p ON tp.participant_id = p.id
             LEFT JOIN devices d ON tp.device_id = d.id
             WHERE test_id = ?
@@ -3349,9 +3363,11 @@ async function getTestParticipantResults(_, { id = null }) {
         mileage: p.distance,
         duration: p.time == null ? "-" : toHHMMSS(p.time),
         participantId: p.participant_id,
-        score: String(
-          getScore(test.mode, p.gender, p.distance, p.time, getAge(p.birthDate))
-        ), // todo: age based on startTimestamp test
+        score: p.score,
+        //// SCORE SEBELUMNYA.. MENGHITUNG ULANG/////
+        //score: String(
+        //  getScore(test.mode, p.gender, p.distance, p.time, getAge(p.birthDate))
+        //), // todo: age based on startTimestamp test
       }));
     } else {
       return null;
@@ -4002,11 +4018,24 @@ function getScore(mode, gender, distance, time = null, age) {
       new Map([
         [
           "MALE",
-          calculateScoreMale2(distance),
+          calculateScoreMale(age, distance),
         ],
         [
           "FEMALE",
-          calculateScoreFemale2(distance),
+          calculateScoreFemale(age, distance),
+        ],
+      ]),
+    ],
+    [
+      4,
+      new Map([
+        [
+          "MALE",
+          calculateScoreMale(distance),
+        ],
+        [
+          "FEMALE",
+          calculateScoreFemale(distance),
         ],
       ]),
     ],
